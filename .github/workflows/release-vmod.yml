@@ -1,0 +1,48 @@
+name: Build VMod release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    runs-on: windows-latest
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+      DOTNET_NOLOGO: "1"
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Install .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.425
+
+      - name: Publish self-contained VMod
+        shell: pwsh
+        run: dotnet publish src/VMod/VMod.csproj -c Release -r win-x64 --self-contained true -o publish
+
+      - name: Verify executable and checksum
+        id: verify
+        shell: pwsh
+        run: |
+          $process = Start-Process -FilePath .\publish\VMod.exe -ArgumentList --self-check -Wait -PassThru
+          if ($process.ExitCode -ne 0) { throw "VMod self-check failed with exit code $($process.ExitCode)" }
+          $hash = (Get-FileHash -Algorithm SHA256 .\publish\VMod.exe).Hash
+          "VMod.exe  $hash" | Set-Content -Encoding ascii .\publish\SHA256.txt
+          "sha256=$hash" >> $env:GITHUB_OUTPUT
+
+      - name: Attach files to release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload v2.0.0 .\publish\VMod.exe .\publish\SHA256.txt --clobber
+          gh release edit v2.0.0 --draft=false
+
+      - name: Summary
+        shell: pwsh
+        run: '"VMod.exe SHA-256: ${{ steps.verify.outputs.sha256 }}" >> $env:GITHUB_STEP_SUMMARY'
