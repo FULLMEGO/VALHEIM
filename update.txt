@@ -1,4 +1,4 @@
-version=1.2.1.0
-url=https://github.com/FULLMEGO/VALHEIM/releases/download/v1.2.1/Valheim-Mods-Installer-Windows.exe
-sha256=6083B1C26E5F7B6FBB9564707E06A578BF9046582A4D12A2FCBF9EAEC02CC2FF
-notes=Добавлены выборочное и полное удаление модов, резервные копии, режим выделенного сервера и автоматическое обновление программы.
+version=2.0.0.0
+url=https://github.com/FULLMEGO/VALHEIM/releases/download/v2.0.0/VMod.exe
+sha256=302A8B931BBC8E3D664A6AD49281554C7A9D853358FE7692822335A459C71876
+notes=Новый интерфейс VMod, включение и отключение модов, импорт ZIP перетаскиванием, счётчики состояний, установка в игру и сервер, а также кнопки запуска.
